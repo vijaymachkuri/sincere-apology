@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Music, Music4, Heart, X, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { Music, Music4, Heart, X, Sparkles, Image as ImageIcon, Lock } from 'lucide-react';
 import Image from 'next/image';
 
 // --- Types & Constants ---
@@ -119,6 +119,9 @@ export default function ApologyPage() {
   const [showModal, setShowModal] = useState(false);
   const [stars, setStars] = useState<Star[]>([]);
   const [rainingHearts, setRainingHearts] = useState(false);
+  const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Sparkle interaction
@@ -195,7 +198,7 @@ export default function ApologyPage() {
             {!isLetterOpen ? (
               <motion.button
                 key="envelope"
-                onClick={() => setIsLetterOpen(true)}
+                onClick={() => setShowPasswordPrompt(true)}
                 className="relative group cursor-pointer"
                 animate={{ rotate: [-2, 2, -2], y: [-5, 5, -5] }}
                 transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
@@ -209,8 +212,8 @@ export default function ApologyPage() {
                   {/* Body */}
                   <div className="absolute bottom-0 left-0 w-full h-full bg-[#FFF9F4] z-0" />
                   <div className="absolute inset-0 flex items-center justify-center z-20 pt-10">
-                    <div className="px-6 py-2 bg-white/50 backdrop-blur-sm rounded-full text-sm font-serif text-[#A98BC9] shadow-sm tracking-widest border border-white">
-                      TAP TO OPEN
+                    <div className="flex items-center gap-2 px-6 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm font-serif text-[#A98BC9] shadow-sm tracking-widest border border-white transition-colors group-hover:bg-white/80">
+                      <Lock size={16} /> TAP TO UNLOCK
                     </div>
                   </div>
                 </div>
@@ -221,20 +224,22 @@ export default function ApologyPage() {
                 initial={{ opacity: 0, y: 50, scale: 0.9, rotateX: 20 }}
                 animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
                 transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-2xl bg-[#FFFDFB] p-10 md:p-16 rounded-2xl shadow-2xl relative"
-                style={{
-                  backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")',
-                  boxShadow: '0 20px 60px -15px rgba(217, 140, 154, 0.2), 0 0 40px rgba(253, 236, 236, 0.5)'
-                }}
+                className="w-full max-w-2xl bg-white/30 backdrop-blur-2xl p-10 md:p-16 rounded-[2rem] shadow-[0_8px_32px_0_rgba(217,140,154,0.15)] border border-white/60 relative overflow-hidden"
               >
+                {/* Glass reflections */}
+                <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-white/40 to-transparent pointer-events-none rounded-t-[2rem]" />
+                <div className="absolute -left-20 top-0 w-40 h-full bg-white/20 skew-x-[30deg] pointer-events-none blur-xl opacity-50" />
+                
                 {/* Letter Content */}
-                <div className="font-handwriting text-3xl md:text-4xl leading-relaxed text-gray-700 space-y-6">
-                  <p>Dear Gem,</p>
+                <div className="font-serif text-xl md:text-2xl leading-[2.2] tracking-wide text-gray-800 space-y-8 relative z-10 font-light">
+                  <p className="text-3xl font-medium text-[#D98C9A]">Dear Gem,</p>
                   <p className="whitespace-pre-wrap">
                     {"I am so deeply sorry for how I hurt you. You didn't deserve that, and it was entirely my fault.\n\nI've been reflecting a lot, and I realize now how my actions made you feel unheard and unvalued. A true partner should be a source of safety and peace, not stress or pain. I am taking full responsibility for my mistakes, and I am committed to working on myself so I never make you feel that way again.\n\nI don't expect you to forgive me right away. Please take all the time and space you need. I just wanted you to know how truly sorry I am, and how much you mean to me."}
                   </p>
-                  <p className="pt-8">Sincerely,</p>
-                  <p>Vijay</p>
+                  <div className="pt-8">
+                    <p className="italic text-gray-500">Sincerely,</p>
+                    <p className="font-handwriting text-5xl text-[#A98BC9] mt-4">Vijay</p>
+                  </div>
                 </div>
               </motion.div>
             )}
@@ -242,40 +247,41 @@ export default function ApologyPage() {
         </motion.div>
 
         {/* Memory Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="w-full max-w-5xl my-24 space-y-12 no-sparkle"
-        >
-          <div className="text-center space-y-2">
-             <h2 className="font-serif text-3xl text-[#A98BC9]">Moments I Cherish</h2>
-             <p className="text-gray-500 font-light">Things I'll never forget.</p>
-          </div>
-          
-          <div className="flex overflow-x-auto pb-12 pt-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6 md:gap-8 justify-start md:justify-center">
-            {[
-              { id: 1, title: "Your beautiful smile", image: "/images/photo1.jpg" },
-              { id: 2, title: "Radiant in nature", image: "/images/photo2.jpg" },
-              { id: 3, title: "Lost in your eyes", image: "/images/photo3.jpg" },
-              { id: 4, title: "The purple bouquet", image: "/images/photo4.jpg" },
-              { id: 5, title: "Dinner dates with you", image: "/images/photo5.jpg" }
-            ].map((card, i) => (
-              <motion.div
-                key={card.id}
-                className="snap-center shrink-0 w-64 h-80 bg-white/60 backdrop-blur-md rounded-xl p-4 shadow-lg border border-white flex flex-col items-center cursor-pointer group"
-                whileHover={{ scale: 1.05, y: -10, backgroundColor: 'rgba(255,255,255,0.9)' }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
-                <div className="w-full h-56 relative rounded-lg mb-4 overflow-hidden shadow-inner group-hover:shadow-md transition-shadow duration-500">
-                  <Image src={card.image} alt={card.title} fill className="object-cover" referrerPolicy="no-referrer" />
-                </div>
-                <p className="font-serif italic text-lg text-gray-700 text-center mt-auto mb-2">{card.title}</p>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        {isLetterOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+            className="w-full max-w-5xl my-24 space-y-12 no-sparkle"
+          >
+            <div className="text-center space-y-2">
+               <h2 className="font-serif text-3xl text-[#A98BC9]">Moments I Cherish</h2>
+               <p className="text-gray-500 font-light">Things I'll never forget.</p>
+            </div>
+            
+            <div className="flex overflow-x-auto pb-12 pt-4 px-4 snap-x snap-mandatory hide-scrollbar gap-6 md:gap-8 justify-start md:justify-center">
+              {[
+                { id: 1, image: "/images/photo1.jpg" },
+                { id: 2, image: "/images/photo2.jpg" },
+                { id: 3, image: "/images/photo3.jpg" },
+                { id: 4, image: "/images/photo4.jpg" },
+                { id: 5, image: "/images/photo5.jpg" }
+              ].map((card, i) => (
+                <motion.div
+                  key={card.id}
+                  className="snap-center shrink-0 w-72 h-[22rem] bg-white/20 backdrop-blur-xl rounded-2xl p-2 shadow-[0_8px_32px_0_rgba(0,0,0,0.05)] border border-white/50 cursor-pointer group"
+                  whileHover={{ scale: 1.03, y: -5, backgroundColor: 'rgba(255,255,255,0.3)' }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
+                  <div className="w-full h-full relative rounded-xl overflow-hidden shadow-sm">
+                    <Image src={card.image} alt="Cherished moment" fill className="object-cover transition-transform duration-700 group-hover:scale-105" referrerPolicy="no-referrer" />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Footer */}
         <motion.div
@@ -390,6 +396,105 @@ export default function ApologyPage() {
                 ))}
               </div>
             )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Password Prompt Modal */}
+      <AnimatePresence>
+        {showPasswordPrompt && (
+          <motion.div
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-white/20 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => {
+              setShowPasswordPrompt(false);
+              setPasswordInput('');
+              setPasswordError(false);
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white/90 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-sm text-center relative border border-[#FDECEC]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto bg-[#FDECEC] w-12 h-12 rounded-full flex items-center justify-center mb-4 text-[#D98C9A]">
+                <Lock size={24} />
+              </div>
+              <h3 className="font-serif text-2xl text-gray-800 mb-2">Private Letter</h3>
+              <p className="text-gray-500 font-light text-sm mb-6">Please enter the passcode to unlock.</p>
+              
+              <input 
+                type="password"
+                maxLength={4}
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value);
+                  setPasswordError(false);
+                }}
+                className={`w-full text-center text-3xl tracking-[0.75em] p-4 border-2 rounded-xl outline-none transition-all duration-300 font-mono bg-white/50 ${
+                  passwordError 
+                    ? 'border-red-300 bg-red-50 text-red-600 focus:border-red-400' 
+                    : 'border-[#FDECEC] focus:border-[#D98C9A] text-gray-700'
+                }`}
+                placeholder="****"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    if (passwordInput === '0905') {
+                      setShowPasswordPrompt(false);
+                      setIsLetterOpen(true);
+                      setPasswordInput('');
+                    } else {
+                      setPasswordError(true);
+                    }
+                  }
+                }}
+              />
+              <AnimatePresence>
+                {passwordError && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }} 
+                    animate={{ opacity: 1, y: 0 }} 
+                    exit={{ opacity: 0 }}
+                    className="text-red-500 text-sm mt-3 font-medium"
+                  >
+                    Incorrect passcode. Try again.
+                  </motion.p>
+                )}
+              </AnimatePresence>
+              
+              <div className="mt-8 flex gap-3">
+                <button 
+                  onClick={() => {
+                    setShowPasswordPrompt(false);
+                    setPasswordInput('');
+                    setPasswordError(false);
+                  }}
+                  className="flex-1 py-3 rounded-xl text-gray-600 font-medium hover:bg-gray-100 transition-colors focus:outline-none"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    if (passwordInput === '0905') {
+                      setShowPasswordPrompt(false);
+                      setIsLetterOpen(true);
+                      setPasswordInput('');
+                    } else {
+                      setPasswordError(true);
+                    }
+                  }}
+                  className="flex-1 py-3 rounded-xl bg-[#D98C9A] text-white font-medium shadow-md hover:bg-[#C27A88] hover:shadow-lg transition-all focus:outline-none"
+                >
+                  Unlock
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
