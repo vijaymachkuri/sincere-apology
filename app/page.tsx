@@ -122,10 +122,22 @@ export default function ApologyPage() {
   const [showPasswordPrompt, setShowPasswordPrompt] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
+  const [hasManuallyPaused, setHasManuallyPaused] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.play().catch(() => console.log("Autoplay blocked by browser."));
+    }
+  }, []);
 
   // Sparkle interaction
   const handleGlobalClick = useCallback((e: React.MouseEvent) => {
+    // Attempt to start audio on first interaction if blocked by browser
+    if (audioRef.current && audioRef.current.paused && !hasManuallyPaused) {
+      audioRef.current.play().catch(() => {});
+    }
+
     // Avoid triggering if clicking on interactive elements directly
     const target = e.target as HTMLElement;
     if (target.closest('button') || target.closest('.no-sparkle')) return;
@@ -135,18 +147,19 @@ export default function ApologyPage() {
     setTimeout(() => {
       setStars((prev) => prev.filter((s) => s.id !== newStar.id));
     }, 1000);
-  }, []);
+  }, [hasManuallyPaused]);
 
   const toggleMusic = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (musicPlaying) {
-      audioRef.current?.pause();
-    } else {
-      audioRef.current?.play().catch(() => {
-        console.log("Audio playback requires user interaction and a valid source.");
-      });
+    if (audioRef.current) {
+      if (!audioRef.current.paused) {
+        audioRef.current.pause();
+        setHasManuallyPaused(true);
+      } else {
+        audioRef.current.play().catch(() => {});
+        setHasManuallyPaused(false);
+      }
     }
-    setMusicPlaying(!musicPlaying);
   };
 
   const handleHeartClick = (e: React.MouseEvent) => {
@@ -165,8 +178,8 @@ export default function ApologyPage() {
       
       <Background isLetterOpen={isLetterOpen} />
 
-      {/* Hidden audio element - placeholder src */}
-      <audio ref={audioRef} loop src="https://cdn.pixabay.com/download/audio/2022/02/10/audio_51bf1218ac.mp3?filename=soft-piano-100-bpm-121529.mp3" />
+      {/* Hidden audio element */}
+      <audio ref={audioRef} loop autoPlay src="/Kızlar.mp3" onPlay={() => setMusicPlaying(true)} onPause={() => setMusicPlaying(false)} />
 
       {/* Main Content */}
       <main className="relative z-10 container mx-auto px-6 py-24 flex flex-col items-center justify-start min-h-screen">
