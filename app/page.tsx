@@ -179,7 +179,7 @@ export default function ApologyPage() {
       <Background isLetterOpen={isLetterOpen} />
 
       {/* Hidden audio element */}
-      <audio ref={audioRef} loop autoPlay src="/Kızlar.mp3" onPlay={() => setMusicPlaying(true)} onPause={() => setMusicPlaying(false)} />
+      <audio ref={audioRef} loop autoPlay src="/kizlar.mp3" onPlay={() => setMusicPlaying(true)} onPause={() => setMusicPlaying(false)} />
 
       {/* Main Content */}
       <main className="relative z-10 container mx-auto px-6 py-24 flex flex-col items-center justify-start min-h-screen">
